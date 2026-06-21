@@ -356,7 +356,8 @@ class Particle {
 
 function createParticles(count) {
   particles = [];
-  for (let i = 0; i < count; i++) {
+  const adjustedCount = window.innerWidth < 600 ? Math.floor(count / 2) : count;
+  for (let i = 0; i < adjustedCount; i++) {
     particles.push(new Particle(particleMode));
   }
 }
@@ -447,37 +448,7 @@ function setupEventListeners() {
   const coverContainer = document.querySelector('.book-container');
   const cover = document.querySelector('.book-cover');
 
-  coverContainer.addEventListener('mousemove', (e) => {
-    const coverPage = document.getElementById('page-cover');
-    if (coverPage.classList.contains('flipped')) return;
 
-    const rect = coverContainer.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width/2;
-    const y = e.clientY - rect.top - rect.height/2;
-
-    const rotateX = -y / (rect.height / 30);
-    const rotateY = x / (rect.width / 30);
-
-    gsap.to(cover, {
-      rotateX: rotateX,
-      rotateY: rotateY,
-      duration: 0.15,
-      ease: 'power2.out',
-      transformPerspective: 1000
-    });
-  });
-
-  coverContainer.addEventListener('mouseleave', () => {
-    const coverPage = document.getElementById('page-cover');
-    if (coverPage.classList.contains('flipped')) return;
-
-    gsap.to(cover, {
-      rotateX: 0,
-      rotateY: 0,
-      duration: 0.6,
-      ease: 'power3.out'
-    });
-  });
 
   document.getElementById('open-book-btn').addEventListener('click', openBook);
 
