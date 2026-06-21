@@ -1,0 +1,10 @@
+{
+  "name": "bassant-magic-book",
+  "version": "1.0.0",
+  "description": "Magic Memory Book & Mood Booster Capsule for Bassant",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y http-server . -p 3000"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,973 @@
+/* Import modern serif and cursive fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Sacramento&display=swap');
+
+/* Color Variables */
+:root {
+  --bg-dark: #0b0f19;
+  --gold: #d4af37;
+  --gold-glow: #ffdd67;
+  --neon-blue: #00f0ff;
+  --neon-blue-dark: #0072ff;
+  --glass-bg: rgba(11, 15, 25, 0.75);
+  --glass-border: rgba(212, 175, 55, 0.25);
+  --glass-border-blue: rgba(0, 240, 255, 0.25);
+  --text-light: #f3e5ab;
+  --text-white: #ffffff;
+  --font-body: 'Poppins', sans-serif;
+  --font-title: 'Playfair Display', serif;
+  --font-cursive: 'Great Vibes', cursive;
+  --font-neon: 'Sacramento', cursive;
+}
+
+/* Reset & Core Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1500px;
+}
+
+/* Background Canvas */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Audio Control Switch */
+.audio-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--glass-border);
+  color: var(--gold);
+  padding: 10px 15px;
+  border-radius: 30px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.audio-toggle:hover {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.audio-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Main Container */
+#app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Scene Styles */
+.scene {
+  position: absolute;
+  width: 100%;
+  max-width: 900px;
+  height: 90%;
+  max-height: 600px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.scene.active {
+  display: flex;
+}
+
+/* SCENE 2: THE 3D BOOK & COVER */
+#scene-book {
+  perspective: 2000px;
+}
+
+.book-container {
+  width: 95%;
+  max-width: 440px;
+  height: 560px; /* Increased height for desktop to prevent overflow */
+  position: relative;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Magical Light Burst Effect (Yellow-Gold Radial) */
+.light-burst {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #ffffff 0%, #ffe875 30%, #d4af37 60%, rgba(11, 15, 25, 0) 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transform: scale(0);
+  filter: blur(20px);
+  top: 50%;
+  left: 50%;
+  margin-top: -175px;
+  margin-left: -175px;
+}
+
+/* SVG Golden Rays */
+.golden-rays {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transform: scale(0.2);
+  top: 50%;
+  left: 50%;
+  margin-top: -250px;
+  margin-left: -250px;
+}
+
+/* The sheets that flip */
+.book-page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  z-index: 2;
+  transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  border-radius: 0 15px 15px 0;
+  box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Inside page content styling - Flexbox layout guarantees no overlaps */
+.page-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 0 15px 15px 0;
+  padding: 40px 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  border: 2px solid var(--glass-border);
+  border-left: 8px solid var(--gold);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.page-face::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  border: 1px dashed rgba(212, 175, 55, 0.15);
+  border-radius: 0 10px 10px 0;
+  pointer-events: none;
+}
+
+/* Back of the page (hidden when face up) */
+.page-face.back {
+  transform: rotateY(180deg);
+  border-radius: 15px 0 0 15px;
+  border-left: 2px solid var(--glass-border);
+  border-right: 8px solid var(--gold);
+}
+
+/* SCENE 1: THE MAGIC COVER (PAGE 0 FRONT) */
+.book-cover {
+  background: linear-gradient(135deg, #12192c 0%, #060912 100%);
+  border-radius: 0 15px 15px 0;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 
+              inset 0 0 20px rgba(0, 0, 0, 0.8),
+              0 0 15px rgba(212, 175, 55, 0.15);
+  border: 4px solid var(--gold);
+  border-left: 10px solid var(--gold);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 30px;
+  cursor: pointer;
+}
+
+/* Ornaments and borders on cover */
+.book-cover::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 8px 12px 12px 8px;
+  pointer-events: none;
+}
+
+.book-cover .corner-ornament {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border: 2px solid var(--gold);
+  pointer-events: none;
+}
+
+.book-cover .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+.book-cover .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+.book-cover .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+.book-cover .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+.cover-content {
+  text-align: center;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.cover-title-gothic {
+  font-family: var(--font-cursive);
+  font-size: 2.2rem;
+  color: var(--gold);
+  margin-bottom: 5px;
+  letter-spacing: 2px;
+}
+
+.cover-title-neon {
+  font-family: var(--font-neon);
+  font-size: 5rem;
+  color: #fff;
+  margin-bottom: 10px;
+  animation: neonPulse 2s infinite alternate;
+  line-height: 1;
+}
+
+.cover-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--neon-blue);
+  margin-top: 15px;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+.cover-btn {
+  margin-top: 40px;
+  background: transparent;
+  color: var(--gold);
+  border: 2px solid var(--gold);
+  padding: 12px 30px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.cover-btn:hover {
+  background: var(--gold);
+  color: var(--bg-dark);
+  box-shadow: 0 0 25px var(--gold-glow);
+  transform: scale(1.05);
+}
+
+/* Inside Cover Lining (Back of Cover Page) */
+.inside-cover {
+  background: linear-gradient(135deg, #101625 0%, #060910 100%) !important;
+  border-radius: 15px 0 0 15px !important;
+  padding: 30px !important;
+}
+
+.inside-cover::before {
+  border-radius: 10px 0 0 10px !important;
+}
+
+.inside-cover .corner-ornament {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border: 1px solid var(--gold);
+  pointer-events: none;
+}
+.inside-cover .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+.inside-cover .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+
+.inside-cover-content {
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 40px 20px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+}
+
+.inside-cover-content h3 {
+  font-family: var(--font-title);
+  color: var(--gold);
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.inside-cover-content p {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Soft Neon Glowing Keyframes */
+@keyframes neonPulse {
+  0% {
+    text-shadow: 0 0 4px #fff,
+                 0 0 10px #fff,
+                 0 0 20px var(--neon-blue),
+                 0 0 30px var(--neon-blue),
+                 0 0 40px var(--neon-blue-dark);
+  }
+  50% {
+    text-shadow: 0 0 2px #fff,
+                 0 0 8px #fff,
+                 0 0 15px var(--gold),
+                 0 0 25px var(--gold),
+                 0 0 35px var(--gold-glow);
+  }
+  100% {
+    text-shadow: 0 0 4px #fff,
+                 0 0 10px #fff,
+                 0 0 20px var(--neon-blue),
+                 0 0 30px var(--neon-blue),
+                 0 0 40px var(--neon-blue-dark);
+  }
+}
+
+/* Inside page components - Flexbox distribution prevents overlaps */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding-bottom: 10px;
+  flex-shrink: 0; /* Never shrink header */
+  z-index: 2;
+}
+
+.page-title {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.page-number {
+  font-size: 0.8rem;
+  color: var(--neon-blue);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Auto scrollable body area handles long texts perfectly */
+.page-body {
+  flex-grow: 1; /* Occupies all middle space */
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-white);
+  z-index: 2;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Ensure perfect spacing between words during typewriter animation */
+.page-body span {
+  display: inline-block;
+  margin-right: 0.26em; /* Clear space between words */
+  margin-bottom: 0.1em;
+}
+
+.page-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.page-body::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 2px;
+}
+
+.page-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  flex-shrink: 0; /* Never shrink footer */
+  z-index: 2;
+}
+
+/* Nav Buttons inside pages */
+.page-nav-btn {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+}
+
+.page-nav-btn:hover {
+  background: var(--gold);
+  color: var(--bg-dark);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.page-nav-btn.next-page {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+}
+
+.page-nav-btn.next-page:hover {
+  background: var(--neon-blue);
+  color: var(--bg-dark);
+  box-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* Glowing trigger button on page 6 */
+.trigger-btn {
+  background: linear-gradient(135deg, #ff0055 0%, #ff5500 100%);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 30px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+  transition: all 0.3s ease;
+  animation: pulseButton 1.5s infinite alternate;
+}
+
+.trigger-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(255, 0, 85, 0.8);
+}
+
+@keyframes pulseButton {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+/* Flipping classes applied by JS */
+.book-page.flipped {
+  transform: rotateY(-180deg);
+  z-index: 1 !important;
+}
+
+/* SCENE 3: THE MOOD BOOSTER CAPSULE */
+#scene-capsule {
+  flex-direction: column;
+  gap: 30px;
+}
+
+.capsule-wrapper {
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.capsule-box {
+  background: rgba(11, 15, 25, 0.75);
+  border: 2px solid var(--neon-blue);
+  border-radius: 40px;
+  padding: 50px 40px;
+  text-align: center;
+  max-width: 480px;
+  width: 90vw;
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.3), 
+              inset 0 0 20px rgba(0, 240, 255, 0.1);
+  backdrop-filter: blur(20px);
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+.capsule-box.show {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.capsule-status {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ff2a5f;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  animation: flashCritical 1s infinite alternate;
+}
+
+@keyframes flashCritical {
+  0% { opacity: 0.3; text-shadow: none; }
+  100% { opacity: 1; text-shadow: 0 0 10px #ff2a5f; }
+}
+
+.capsule-title {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  color: var(--text-white);
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+/* Giant capsule press button */
+.capsule-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.capsule-btn {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff2a5f 0%, #aa0033 100%);
+  border: 4px solid var(--text-white);
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255, 42, 95, 0.5), 
+              0 0 25px rgba(255, 42, 95, 0.4),
+              inset 0 5px 15px rgba(255,255,255,0.4);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 15px;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  animation: floatCapsule 2s infinite ease-in-out alternate;
+}
+
+.capsule-btn:hover {
+  transform: scale(1.08) translateY(-5px);
+  box-shadow: 0 15px 35px rgba(255, 42, 95, 0.7), 
+              0 0 40px rgba(255, 42, 95, 0.6);
+}
+
+.capsule-btn:active {
+  transform: scale(0.92) translateY(2px);
+  box-shadow: 0 5px 15px rgba(255, 42, 95, 0.8);
+}
+
+@keyframes floatCapsule {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+/* Comedy Stories Popups */
+.story-box {
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90vw;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 
+              0 0 20px rgba(212, 175, 55, 0.2);
+  backdrop-filter: blur(15px);
+  text-align: left;
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  z-index: 12;
+}
+
+.story-box.active {
+  display: block;
+}
+
+.story-header {
+  font-family: var(--font-title);
+  color: var(--gold);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding-bottom: 8px;
+}
+
+.story-body {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-white);
+  margin-bottom: 25px;
+}
+
+.story-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.story-btn {
+  background: transparent;
+  border: 2px solid var(--neon-blue);
+  color: var(--neon-blue);
+  padding: 10px 24px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.story-btn:hover {
+  background: var(--neon-blue);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--neon-blue);
+}
+
+/* SCENE 4: THE GRAND FINALE */
+#scene-finale {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.finale-box {
+  padding: 40px;
+  max-width: 600px;
+  width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.finale-text {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  line-height: 1.8;
+  color: var(--text-white);
+  margin-bottom: 40px;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.finale-text .cursive-highlight {
+  font-family: var(--font-cursive);
+  font-size: 3.2rem;
+  color: var(--gold);
+  display: block;
+  margin-top: 15px;
+  line-height: 1.2;
+  animation: textShimmer 3s infinite alternate;
+}
+
+@keyframes textShimmer {
+  0% {
+    text-shadow: 0 0 5px var(--gold),
+                 0 0 15px rgba(212, 175, 55, 0.4);
+  }
+  100% {
+    text-shadow: 0 0 12px var(--gold-glow),
+                 0 0 25px var(--gold);
+  }
+}
+
+.finale-btn {
+  background: transparent;
+  border: 1px dashed var(--gold);
+  color: var(--gold);
+  padding: 12px 30px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  border-radius: 30px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.finale-btn:hover {
+  border-style: solid;
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  transform: scale(1.05);
+}
+
+/* Floating elements created dynamically by JS */
+.floating-emoji {
+  position: fixed;
+  font-size: 2.5rem;
+  pointer-events: none;
+  z-index: 20;
+  user-select: none;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 580px) {
+  .book-container {
+    width: 95%;
+    max-width: 330px; /* Reduced max-width for mobile viewports */
+    height: 490px;    /* Height of 490px prevents any height clipping */
+  }
+  
+  .golden-rays {
+    width: 320px;
+    height: 320px;
+    margin-top: -160px;
+    margin-left: -160px;
+  }
+
+  .book-page.flipped {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+  
+  .book-cover {
+    padding: 25px 20px;
+    border-width: 3px;
+    border-left-width: 8px;
+  }
+
+  .cover-title-gothic {
+    font-size: 1.5rem;
+  }
+
+  .cover-title-neon {
+    font-size: 3.2rem;
+  }
+
+  .cover-subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+
+  .cover-btn {
+    margin-top: 20px;
+    padding: 8px 18px;
+    font-size: 0.75rem;
+  }
+
+  .page-face {
+    padding: 25px 20px;
+    border-left-width: 6px;
+  }
+
+  .page-face.back {
+    border-right-width: 6px;
+  }
+
+  .page-title {
+    font-size: 1.05rem;
+  }
+
+  .page-body {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 0.82rem; /* Reduced font-size prevents clipping/cluttering */
+    line-height: 1.55;
+    padding-right: 4px;
+  }
+
+  .page-footer {
+    margin-top: 5px;
+  }
+
+  .page-nav-btn {
+    padding: 6px 12px;
+    font-size: 0.72rem;
+  }
+
+  .capsule-box {
+    padding: 30px 20px;
+  }
+
+  .capsule-title {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .capsule-btn {
+    width: 110px;
+    height: 110px;
+    font-size: 0.8rem;
+  }
+
+  .story-box {
+    padding: 20px;
+  }
+
+  .story-header {
+    font-size: 1.1rem;
+  }
+
+  .story-body {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .finale-text {
+    font-size: 1.3rem;
+    line-height: 1.6;
+  }
+
+  .finale-text .cursive-highlight {
+    font-size: 2.3rem;
+  }
+}
+
+/* Sound Prompt Dialog overlay on start */
+.sound-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(11, 15, 25, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease;
+}
+
+.sound-modal {
+  background: rgba(18, 25, 44, 0.85);
+  border: 1px solid var(--glass-border);
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(15px);
+}
+
+.sound-modal h2 {
+  font-family: var(--font-title);
+  color: var(--gold);
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+}
+
+.sound-modal p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-white);
+  margin-bottom: 30px;
+}
+
+.sound-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.sound-btn {
+  padding: 10px 25px;
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sound-btn.yes {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--bg-dark);
+}
+
+.sound-btn.yes:hover {
+  box-shadow: 0 0 15px var(--gold-glow);
+  transform: translateY(-2px);
+}
+
+.sound-btn.no {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: var(--text-white);
+}
+
+.sound-btn.no:hover {
+  background: rgba(255,255,255,0.05);
+}

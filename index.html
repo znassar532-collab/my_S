@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bassant's Magic Memory Book & Mood Booster</title>
+  <!-- SEO & Social Meta Tags -->
+  <meta name="description" content="A magical single-page interactive book and mood booster capsule created especially for Bassant.">
+  <meta name="theme-color" content="#0b0f19">
+  
+  <!-- Tailwind CSS CDN for utility spacing (Fallback/Enhancement) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Canvas for Sparkles & Hearts Particles -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Audio Toggle (Top Right) -->
+  <button id="sound-toggle" class="audio-toggle">
+    <svg class="audio-toggle-icon" viewBox="0 0 24 24">
+      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+    </svg>
+    <span class="audio-toggle-text">SOUND OFF</span>
+  </button>
+
+  <!-- Sound Permission Overlay (User Engagement Prompt) -->
+  <div id="sound-prompt" class="sound-overlay">
+    <div class="sound-modal">
+      <h2>Experience the Magic!</h2>
+      <p>Would you like to turn on the magical background music and custom 3D page-flip sound effects for this book?</p>
+      <div class="sound-buttons">
+        <button id="sound-yes" class="sound-btn yes">Yes, Play Audio</button>
+        <button id="sound-no" class="sound-btn no">No, Keep Mute</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App View Wrapper -->
+  <main id="app-container">
+
+    <!-- ==========================================
+         SCENE: THE UNIFIED 3D BOOK (Covers Scenes 1 & 2)
+         ========================================== -->
+    <section id="scene-book" class="scene active">
+      <div class="book-container">
+        
+        <!-- Magic Light Burst Effect behind pages (Yellow/Gold Radial Flare) -->
+        <div id="light-burst" class="light-burst"></div>
+
+        <!-- SVG Golden Rays burst effect -->
+        <svg id="golden-rays-svg" viewBox="0 0 100 100" class="golden-rays">
+          <defs>
+            <radialGradient id="gold-grad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="25%" stop-color="#ffdd67" stop-opacity="0.8"/>
+              <stop offset="60%" stop-color="#d4af37" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="50" cy="50" r="16" fill="url(#gold-grad)"/>
+          <g id="rays-group" stroke="url(#gold-grad)" stroke-width="1.5">
+            <line x1="50" y1="50" x2="50" y2="0" />
+            <line x1="50" y1="50" x2="50" y2="100" />
+            <line x1="50" y1="50" x2="0" y2="50" />
+            <line x1="50" y1="50" x2="100" y2="50" />
+            <line x1="50" y1="50" x2="15" y2="15" />
+            <line x1="50" y1="50" x2="85" y2="85" />
+            <line x1="50" y1="50" x2="85" y2="15" />
+            <line x1="50" y1="50" x2="15" y2="85" />
+            
+            <line x1="50" y1="50" x2="50" y2="10" />
+            <line x1="50" y1="50" x2="30" y2="10" />
+            <line x1="50" y1="50" x2="70" y2="10" />
+            <line x1="50" y1="50" x2="30" y2="90" />
+            <line x1="50" y1="50" x2="70" y2="90" />
+            <line x1="50" y1="50" x2="10" y2="30" />
+            <line x1="50" y1="50" x2="10" y2="70" />
+            <line x1="50" y1="50" x2="90" y2="30" />
+            <line x1="50" y1="50" x2="90" y2="70" />
+          </g>
+        </svg>
+
+        <!-- PAGE 0: THE MAGIC COVER (Flips to reveal Page 1) -->
+        <div id="page-cover" class="book-page" style="z-index: 7;">
+          <!-- Front of Cover -->
+          <div class="page-face book-cover">
+            <!-- Corner Gold Filigree Ornaments -->
+            <div class="corner-ornament top-left"></div>
+            <div class="corner-ornament top-right"></div>
+            <div class="corner-ornament bottom-left"></div>
+            <div class="corner-ornament bottom-right"></div>
+            
+            <div class="cover-content">
+              <h2 class="cover-title-gothic">For My Sister</h2>
+              <h1 class="cover-title-neon">Bassant</h1>
+              <p class="cover-subtitle">The Chronicles of an Amazing Sister</p>
+              
+              <button id="open-book-btn" class="cover-btn">
+                OPEN THE MAGIC BOOK
+              </button>
+            </div>
+          </div>
+          <!-- Inside Cover (Back of page 0) -->
+          <div class="page-face back inside-cover">
+            <div class="corner-ornament top-left"></div>
+            <div class="corner-ornament bottom-left"></div>
+            <div class="inside-cover-content">
+              <div class="vintage-pattern"></div>
+              <h3>The Chronicles Begin...</h3>
+              <p>Flip the pages to uncover the memories and strength you carry inside you, Bassant.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 1 (University) -->
+        <div id="page-1" class="book-page" style="z-index: 6;">
+          <div class="page-face">
+            <div class="page-header">
+              <span class="page-title">The University Journey</span>
+              <span class="page-number">01 / 06</span>
+            </div>
+            <div class="page-body">
+              I know you’re incredibly overwhelmed and stressed out right now, Bassant... But remember how much you’ve already overcome? The journey was massive, but you proved you are more than capable. Remember when you were at the university, and the adventure felt so heavy? You didn't know what to do and found it so difficult, especially those last two years. But you pushed through, overcame the heavy burden, and became a brilliant Doctor that anyone would be deeply proud of.
+            </div>
+            <div class="page-footer">
+              <span></span>
+              <button class="page-nav-btn next-page">Next Page &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 2 (Ophthalmology) -->
+        <div id="page-2" class="book-page" style="z-index: 5;">
+          <div class="page-face">
+            <div class="page-header">
+              <span class="page-title">The Ophthalmology Challenge</span>
+              <span class="page-number">02 / 06</span>
+            </div>
+            <div class="page-body">
+              Remember when you tried to become an Ophthalmology doctor? The topic was insanely hard, and you faced an endless amount of annoying, ruthless obstacles and pressure along the way. But you kept going, you persisted, and you conquered it. Mashallah, Bassant, you did it!
+            </div>
+            <div class="page-footer">
+              <button class="page-nav-btn prev-page">&larr; Back</button>
+              <button class="page-nav-btn next-page">Next Page &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 3 (Thank You) -->
+        <div id="page-3" class="book-page" style="z-index: 4;">
+          <div class="page-face">
+            <div class="page-header">
+              <span class="page-title">My Special Thank You</span>
+              <span class="page-number">03 / 06</span>
+            </div>
+            <div class="page-body">
+              Here is something personal from me... Even though you were always completely stressed and under immense pressure yourself, you NEVER turned me down. You always supported me and never let me feel abandoned, especially when I was in my High School (3rd Secondary) year. I will never forget your constant support.
+            </div>
+            <div class="page-footer">
+              <button class="page-nav-btn prev-page">&larr; Back</button>
+              <button class="page-nav-btn next-page">Next Page &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 4 (Goethe & Dativ) -->
+        <div id="page-4" class="book-page" style="z-index: 3;">
+          <div class="page-face">
+            <div class="page-header">
+              <span class="page-title">The Goethe & Dativ Struggle</span>
+              <span class="page-number">04 / 06</span>
+            </div>
+            <div class="page-body">
+              You are always striving to develop your life and improve yourself, especially your amazing efforts at the Goethe-Institut! You understood and mastered absolutely everything... well, except for that legendary 'Dativ' rule, which was an absolute nightmare for you! 😂
+            </div>
+            <div class="page-footer">
+              <button class="page-nav-btn prev-page">&larr; Back</button>
+              <button class="page-nav-btn next-page">Next Page &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 5 (Proud Brother) -->
+        <div id="page-5" class="book-page" style="z-index: 2;">
+          <div class="page-face">
+            <div class="page-header">
+              <span class="page-title">The Proud Brother</span>
+              <span class="page-number">05 / 06</span>
+            </div>
+            <div class="page-body">
+              You absolutely must be proud of yourself, Bassant, even if you don't feel it right now. I swear by God that I am incredibly proud to be your younger brother. And most importantly, Mom and Dad are 100% proud of the person you have become.
+            </div>
+            <div class="page-footer">
+              <button class="page-nav-btn prev-page">&larr; Back</button>
+              <button class="page-nav-btn next-page">Next Page &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 6 (The Trigger) -->
+        <div id="page-6" class="book-page" style="z-index: 1;">
+          <div class="page-face">
+            <div class="page-header">
+              <span class="page-title">Release the Pressure</span>
+              <span class="page-number">06 / 06</span>
+            </div>
+            <div class="page-body">
+              You survived all of that, and you will survive today's stress. But first, let's break this tension. Close this book, because it's time to unleash the pressure!
+            </div>
+            <div class="page-footer">
+              <button class="page-nav-btn prev-page">&larr; Back</button>
+              <button id="release-pressure-btn" class="trigger-btn">
+                Close Book & Release Pressure
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCENE 3: MOOD BOOSTER CAPSULE & FUN STORIES
+         ========================================== -->
+    <section id="scene-capsule" class="scene">
+      <!-- The Capsule Box -->
+      <div class="capsule-wrapper">
+        <div class="capsule-box">
+          <p class="capsule-status">Stress Level: Critical</p>
+          <h2 class="capsule-title">Mood Booster Stress Capsule</h2>
+          
+          <div class="capsule-btn-container">
+            <button id="capsule-press-btn" class="capsule-btn">
+              <span>PRESS TO</span>
+              <span>DESTROY</span>
+              <span>STRESS</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Funny Story 1 Popup -->
+      <div id="story-1" class="story-box">
+        <div class="story-header">
+          <span>The Goethe Trap 🤫😂</span>
+        </div>
+        <div class="story-body">
+          Do you remember when you, Hagar, and I were at Goethe? I was taken by absolute confidence and enthusiasm, talking out loud and feeling so happy to be with you and Hagar. We started talking about Shereen, and I poured my whole heart out, saying everything I felt about her and how much she means to me... only to turn around and find Shereen standing right in front of my face! I literally almost died of embarrassment! 💀 And literally ONE minute later, we started making fun of Frau Tarkhan. I said in a very loud voice: 'If Tarkhan does anything to you guys, I’ll literally hang her on a tree!' Suddenly, Tarkhan appears out of nowhere right behind us, saying: 'How are you guys doing?'... That day, I learned a life lesson: to just shut up, shut up forever! 🤫😂
+        </div>
+        <div class="story-footer">
+          <button id="story1-next" class="story-btn">Read Next Story &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Funny Story 2 Popup -->
+      <div id="story-2" class="story-box">
+        <div class="story-header">
+          <span>The Beano's Glass Door Karma 🤣🤣</span>
+        </div>
+        <div class="story-body">
+          Remember when we were at Beano's? I was furious, throwing a tantrum and loudly complaining about how terrible the place was. You were getting so annoyed and upset with me. As we were leaving, I was walking confidently into the second section, and BOOM! I got completely slammed and flung like a ragdoll straight into the clear glass door! 💥 Everyone in the café gasped in shock and rushed to ask if I was okay... except for YOU! You were dying of laughter, completely cracked up, shouting: 'My justice has been served! Karma caught you!' 🤣🤣
+        </div>
+        <div class="story-footer">
+          <button id="story2-next" class="story-btn">Release Final Magic &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCENE 4: THE GRAND FINALE
+         ========================================== -->
+    <section id="scene-finale" class="scene">
+      <div class="finale-box">
+        <h2 class="finale-text">
+          Always remember, I am always here for you. 
+          <span class="cursive-highlight">
+            Smile, because you look truly beautiful when you do! ❤️
+          </span>
+        </h2>
+        <button id="replay-btn" class="finale-btn">
+          Relive the Magic
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- External Library CDNs -->
+  <!-- GSAP Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Custom Javascript Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
