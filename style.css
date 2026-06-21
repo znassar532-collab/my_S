@@ -127,9 +127,11 @@ body {
   height: 560px; /* Increased height for desktop to prevent overflow */
   position: relative;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   display: flex;
   justify-content: center;
   align-items: center;
+  will-change: transform;
 }
 
 /* Magical Light Burst Effect (Yellow-Gold Radial) */
@@ -174,10 +176,15 @@ body {
   left: 0;
   transform-origin: left center;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   z-index: 2;
   transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   border-radius: 0 15px 15px 0;
   box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 /* Inside page content styling - Flexbox layout guarantees no overlaps */
@@ -185,6 +192,7 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   border-radius: 0 15px 15px 0;
   padding: 40px 35px;
@@ -197,6 +205,8 @@ body {
   border-left: 8px solid var(--gold);
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.4);
   overflow: hidden;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
 }
 
 .page-face::before {
@@ -234,6 +244,43 @@ body {
   align-items: center;
   padding: 40px 30px;
   cursor: pointer;
+  transition: box-shadow 0.5s ease, border-color 0.5s ease;
+}
+
+.book-cover:hover {
+  border-color: var(--gold-glow);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 
+              inset 0 0 30px rgba(0, 0, 0, 0.9),
+              0 0 35px rgba(212, 175, 55, 0.55),
+              0 0 60px rgba(0, 240, 255, 0.35);
+}
+
+.book-cover:hover .cover-title-neon {
+  animation: neonPulseHover 0.8s infinite alternate;
+}
+
+@keyframes neonPulseHover {
+  0% {
+    text-shadow: 0 0 6px #fff,
+                 0 0 15px #fff,
+                 0 0 30px var(--neon-blue),
+                 0 0 45px var(--neon-blue),
+                 0 0 60px var(--neon-blue-dark);
+  }
+  50% {
+    text-shadow: 0 0 4px #fff,
+                 0 0 12px #fff,
+                 0 0 25px var(--gold),
+                 0 0 35px var(--gold),
+                 0 0 50px var(--gold-glow);
+  }
+  100% {
+    text-shadow: 0 0 6px #fff,
+                 0 0 15px #fff,
+                 0 0 30px var(--neon-blue),
+                 0 0 45px var(--neon-blue),
+                 0 0 60px var(--neon-blue-dark);
+  }
 }
 
 /* Ornaments and borders on cover */
